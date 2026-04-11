@@ -1,8 +1,9 @@
 from fastapi import APIRouter
 
-from app.api.routes import health, models
+from app.api.routes import health, models, predict
 
 api_router = APIRouter()
 
 api_router.include_router(health.router, tags=["health"])
 api_router.include_router(models.router, tags=["models"])
+api_router.include_router(predict.router, tags=["predict"])
