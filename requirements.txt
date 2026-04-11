@@ -5,3 +5,5 @@ minio
 scikit-learn
 joblib
 numpy
+sqlalchemy
+psycopg2-binary
