@@ -4,3 +4,4 @@ pydantic-settings
 minio
 scikit-learn
 joblib
+numpy
