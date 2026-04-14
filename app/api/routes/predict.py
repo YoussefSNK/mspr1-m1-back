@@ -18,9 +18,9 @@ def predict_endpoint(request: PredictionRequest, db: Session = Depends(get_db)) 
             save_prediction(
                 db=db,
                 model_name=response.model_name,
-                input=request.input,
-                prediction=response.prediction,
-                probabilities=response.probabilities,
+                input=request.input.model_dump(),
+                prediction=response.prediction.model_dump(),
+                probabilities=None,
             )
             PREDICTIONS_TOTAL.labels(model_name=request.model_name, status="success").inc()
             return response
