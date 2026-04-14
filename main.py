@@ -6,6 +6,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel
 
+from app.api.router import api_router
+from app.core.database import Base, engine
+from app.models import prediction  # noqa: F401
+from app.services.model_registry import load_all_models
 from data_loader import TENDENCY_LABELS, load_all
 
 # ---------------------------------------------------------------------------
@@ -19,6 +23,8 @@ _cities_by_id: dict[int, dict] = {}
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global _cities, _cities_by_id
+    Base.metadata.create_all(bind=engine)
+    load_all_models()
     print("[startup] Chargement des données…")
     _cities = load_all(departement="33")
     _cities_by_id = {c["id"]: c for c in _cities}
@@ -31,6 +37,8 @@ async def lifespan(app: FastAPI):
 # ---------------------------------------------------------------------------
 
 app = FastAPI(title="MSPR Elections API", lifespan=lifespan)
+
+app.include_router(api_router, prefix="/api")
 
 app.add_middleware(
     CORSMiddleware,
