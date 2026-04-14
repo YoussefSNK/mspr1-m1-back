@@ -1,4 +1,4 @@
-import numpy as np
+import pandas as pd
 
 from app.api.schemas.prediction import ElectionPrediction, PredictionRequest, PredictionResponse
 from app.services.model_registry import get_model
@@ -24,10 +24,10 @@ def predict(request: PredictionRequest) -> PredictionResponse:
     scaler = get_model("scaler_electio")
 
     raw = request.input.model_dump()
-    X = np.array([[raw[f] for f in FEATURE_ORDER]], dtype=float)
+    X = pd.DataFrame([[raw[f] for f in FEATURE_ORDER]], columns=FEATURE_ORDER)
 
-    X = imputer.transform(X)
-    X = scaler.transform(X)
+    X = pd.DataFrame(imputer.transform(X), columns=FEATURE_ORDER)
+    X = pd.DataFrame(scaler.transform(X), columns=FEATURE_ORDER)
 
     output = model.predict(X)[0]
 

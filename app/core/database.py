@@ -18,3 +18,15 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+def get_db_optional():
+    try:
+        db = SessionLocal()
+        db.execute(__import__("sqlalchemy").text("SELECT 1"))
+        try:
+            yield db
+        finally:
+            db.close()
+    except Exception:
+        yield None

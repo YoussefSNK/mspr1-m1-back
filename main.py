@@ -23,7 +23,10 @@ _cities_by_id: dict[int, dict] = {}
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global _cities, _cities_by_id
-    Base.metadata.create_all(bind=engine)
+    try:
+        Base.metadata.create_all(bind=engine)
+    except Exception as e:
+        print(f"[startup] PostgreSQL indisponible, persistance désactivée ({e})")
     load_all_models()
     print("[startup] Chargement des données…")
     _cities = load_all(departement="33")
