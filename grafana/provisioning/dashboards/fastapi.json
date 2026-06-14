@@ -1,0 +1,104 @@
+{
+  "title": "FastAPI — MSPR Elections",
+  "uid": "fastapi-mspr",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "10s",
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Requêtes / seconde (total)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(http_requests_total[1m])",
+          "legendFormat": "{{method}} {{handler}} {{status_code}}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Latence p50 / p95 / p99 (s)",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "histogram_quantile(0.50, rate(http_request_duration_seconds_bucket[1m]))",
+          "legendFormat": "p50"
+        },
+        {
+          "datasource": "Prometheus",
+          "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[1m]))",
+          "legendFormat": "p95"
+        },
+        {
+          "datasource": "Prometheus",
+          "expr": "histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[1m]))",
+          "legendFormat": "p99"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Taux d'erreurs 4xx / 5xx",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(http_requests_total{status_code=~\"4..\"}[1m])",
+          "legendFormat": "4xx {{handler}}"
+        },
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(http_requests_total{status_code=~\"5..\"}[1m])",
+          "legendFormat": "5xx {{handler}}"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Requêtes en cours",
+      "type": "stat",
+      "gridPos": { "x": 12, "y": 8, "w": 6, "h": 8 },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "http_requests_inprogress",
+          "legendFormat": "en cours"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Total requêtes (compteur)",
+      "type": "stat",
+      "gridPos": { "x": 18, "y": 8, "w": 6, "h": 8 },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "sum(http_requests_total)",
+          "legendFormat": "total"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Requêtes par endpoint",
+      "type": "bargauge",
+      "gridPos": { "x": 0, "y": 16, "w": 24, "h": 8 },
+      "options": { "orientation": "horizontal" },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "sum by (handler) (increase(http_requests_total{handler!=\"/metrics\"}[5m]))",
+          "legendFormat": "{{handler}}"
+        }
+      ]
+    }
+  ]
+}
